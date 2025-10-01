@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
-type Measurements struct {
-	Nome  string
+type Measurement struct {
 	Min   float64
 	Max   float64
 	Sum   float64
@@ -17,21 +18,53 @@ type Measurements struct {
 }
 
 func main() {
+	start := time.Now()
 	measurements, err := os.Open("meansurement.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer measurements.Close()
+
+	dados := make(map[string]Measurement)
+
 	scanner := bufio.NewScanner(measurements)
 
 	for scanner.Scan() {
 		rawData := scanner.Text()
 		semicolonIndex := strings.Index(rawData, ";")
 		location := rawData[:semicolonIndex]
-		temperature := rawData[semicolonIndex+1:]
+		rawtemp := rawData[semicolonIndex+1:]
 
-		fmt.Println(location, temperature)
-		return
+		temperature, err := strconv.ParseFloat(rawtemp, 64)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		measurement, ok := dados[location]
+
+		if !ok {
+			measurement = Measurement{
+				Min:   temperature,
+				Max:   temperature,
+				Sum:   temperature,
+				Count: 1,
+			}
+		} else {
+			measurement.Min = min(measurement.Min, temperature)
+			measurement.Max = max(measurement.Max, temperature)
+			measurement.Sum += temperature
+			measurement.Count++
+
+		}
+
+		dados[location] = measurement
+
 	}
+
+	for name, measurement := range dados {
+		fmt.Printf("%s: %#+v\n", name, measurement)
+	}
+
+	fmt.Println(time.Since(start))
 
 }
