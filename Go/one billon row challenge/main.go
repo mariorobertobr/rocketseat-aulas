@@ -71,11 +71,13 @@ func main() {
 	sort.Strings(locations)
 
 	fmt.Printf("{")
-	for _, name := range locations {
-		measurement := dados[name]
-		fmt.Printf("%s=%.1f/%.1f/%.1f,", name, measurement.Min, measurement.Sum/float64(measurement.Count), measurement.Max)
+	// for _, name := range locations {
 
-	}
+	// 	// fmt.Println(name)
+	// 	// measurement := dados[name]
+	// 	// fmt.Printf("%s=%.1f/%.1f/%.1f,", name, measurement.Min, measurement.Sum/float64(measurement.Count), measurement.Max)
+
+	// }
 
 	fmt.Printf("}\n")
 
